@@ -7,14 +7,23 @@ module TwitterWrapper
       @client = load_client
     end
 
-    def follow_creators_of_tweets_containing(text)
+    def follow_creators_of_tweets_containing(text, limit = 80)
+      terms = load_terms(text)
+
+      limit_per_term = limit / terms.count
+
+      terms.each do |term|
+        tweets = gather_tweets_containing(term)
+        max_tweets = tweets[0..limit_per_term]
+        follow_users_from(max_tweets)
+      end
+    end
+
+    def load_terms(text)
       terms = []
       terms << text if text.is_a?(String)
       terms = text if text.is_a?(Array)
-
-      tweets = gather_tweets_from(terms)
-
-      follow_users_from(tweets)
+      terms
     end
 
     def test
@@ -27,10 +36,8 @@ module TwitterWrapper
       @client.follow!(users)
     end
 
-    def gather_tweets_from(content)
-      content.map do |str|
-        @client.search("#{str} -rt", lang: "en").to_a
-      end.flatten
+    def gather_tweets_containing(content)
+      @client.search("#{str} -rt", lang: "en").to_a
     end
 
     def load_client
