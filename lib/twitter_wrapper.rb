@@ -1,4 +1,4 @@
-
+require 'dotenv/load'
 require 'twitter'
 
 module TwitterWrapper
@@ -24,7 +24,7 @@ module TwitterWrapper
     def follow_users_from(nodes)
       users = nodes.map(&:user)
 
-      follow!(users)
+      @client.follow!(users)
     end
 
     def gather_tweets_from(content)
