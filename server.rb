@@ -1,3 +1,4 @@
+require 'dotenv/load'
 require 'sinatra'
 require 'base64'
 require 'json'
