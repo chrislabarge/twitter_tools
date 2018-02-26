@@ -37,7 +37,7 @@ module TwitterWrapper
     end
 
     def gather_tweets_containing(content)
-      @client.search("#{str} -rt", lang: "en").to_a
+      @client.search("#{content} -rt", lang: 'en').to_a
     end
 
     def load_client

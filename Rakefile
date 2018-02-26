@@ -7,21 +7,20 @@ include TwitterWrapper
 #   ruby "test/unittest.rb"
 # end
 
-CONFIG_FILES=FileList['config/settings.yml']
+CONFIG_FILES = FileList['config/settings.yml']
 
 def get_config(file)
   YAML.load_file(file)
 end
 
 CONFIG_FILES.each do |f|
-
   config = get_config(f)
 
+  task :follow_users, [:limit] do |_, args|
+    limit = args[:limit].to_i || 80
 
-  #use heroku scheduler to run this task
-  task :add_users do
     client = Wrapper.new
 
-    client.follow_creators_of_tweets_containing(config.terms)
+    client.follow_creators_of_tweets_containing(config['terms'], limit)
   end
 end
