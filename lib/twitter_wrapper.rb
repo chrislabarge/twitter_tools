@@ -1,4 +1,3 @@
-require 'dotenv/load'
 require 'twitter'
 
 module TwitterWrapper
@@ -64,7 +63,7 @@ module TwitterWrapper
       load_final_counts
       count = @is_following - @was_following
       puts 'Success!!'
-      puts "Started following #{count} from the search terms #{terms}"
+      puts "Started following #{count} new users who's recent tweets included one of the following search terms #{terms}"
     end
   end
 end
