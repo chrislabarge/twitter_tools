@@ -1,3 +1,4 @@
+require 'dotenv/load'
 require 'twitter'
 
 module TwitterWrapper
@@ -67,3 +68,4 @@ module TwitterWrapper
     end
   end
 end
+#/1.1/account_activity/webhooks.json?url=https://twitter-marketing.herokuapp.com/account/activity
