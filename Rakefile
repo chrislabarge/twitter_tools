@@ -1,11 +1,17 @@
+require 'dotenv/load'
 require 'yaml'
 require_relative 'lib/twitter_wrapper'
+require 'rspec/core/rake_task'
 include TwitterWrapper
 # task default: %w[test]
 
 # task :test do
 #   ruby "test/unittest.rb"
 # end
+RSpec::Core::RakeTask.new do |task|
+  task.rspec_opts = ["-c", "-f progress", "-r ./spec/spec_helper.rb"]
+  task.pattern    = 'spec/**/*_spec.rb'
+end
 
 CONFIG_FILES = FileList['config/settings.yml']
 
