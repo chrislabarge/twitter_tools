@@ -1,3 +1,4 @@
+require 'dotenv/load'
 require 'yaml'
 require_relative 'lib/twitter_wrapper'
 include TwitterWrapper
@@ -21,6 +22,14 @@ CONFIG_FILES.each do |f|
 
     client = Wrapper.new
 
-    client.follow_creators_of_tweets_containing(config['terms'], limit)
+    client.process_tweets_containing(config['terms'], :follow, limit)
+  end
+
+  task :favorite_tweets, [:limit] do |_, args|
+    limit = args[:limit].to_i || 80
+
+    client = Wrapper.new
+
+    client.process_tweets_containing(config['terms'], :favorite, limit)
   end
 end

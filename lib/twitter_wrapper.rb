@@ -6,8 +6,8 @@ module TwitterWrapper
       @client = load_client
     end
 
-    def follow_creators_of_tweets_containing(text, limit = 80)
-      load_initial_counts
+    def process_tweets_containing(text, method = nil, limit = 80)
+      @original_count = resource_count(method)
       terms = load_terms(text)
 
       limit_per_term = limit / terms.count
@@ -15,10 +15,11 @@ module TwitterWrapper
       terms.each do |term|
         tweets = gather_tweets_containing(term)
         max_tweets = tweets[0..limit_per_term]
-        follow_users_from(max_tweets)
+
+        send(method, max_tweets)
       end
 
-      log_success(terms)
+      log_success(terms, method)
     end
 
     def load_terms(text)
@@ -30,12 +31,6 @@ module TwitterWrapper
 
     def test
       @client
-    end
-
-    def follow_users_from(nodes)
-      users = nodes.map(&:user)
-
-      @client.follow(users)
     end
 
     def gather_tweets_containing(content)
@@ -51,19 +46,40 @@ module TwitterWrapper
       end
     end
 
-    def load_initial_counts
-      @was_following = @client.friend_ids.count
+    def follow(tweets)
+      follow_users_of(tweets)
     end
 
-    def load_final_counts
-      @is_following = @client.friend_ids.count
+    def favorite(tweets)
+      @client.favorite(tweets)
     end
 
-    def log_success(terms)
-      load_final_counts
-      count = @is_following - @was_following
+    def follow_users_of(tweets)
+      users = tweets.map(&:user)
+
+      @client.follow(users)
+    end
+
+    def resource_count(method, options = {})
+      case method
+      when :follow
+        @client.friend_ids.count
+      when :favorite
+        0
+      end
+    end
+
+    def log_success(terms, method)
+      count = resource_count(method) - @original_count
       puts 'Success!!'
-      puts "Started following #{count} new users who's recent tweets included one of the following search terms #{terms}"
+      puts successful_log_msgs(count, terms)[method]
+    end
+
+    def successful_log_msgs(count, terms)
+      {
+        follow: "Started following #{count} new users who's recent tweets included one of the following search terms #{terms}",
+        favorite: "Favorited #{count} new tweets that included one of the following terms #{terms}"
+      }
     end
   end
 end
