@@ -25,6 +25,9 @@ GEM
     rake (12.3.0)
     simple_oauth (0.3.1)
     thread_safe (0.3.6)
+    tty-cursor (0.5.0)
+    tty-spinner (0.8.0)
+      tty-cursor (>= 0.5.0)
     twitter (6.2.0)
       addressable (~> 2.3)
       buftok (~> 0.2.0)
@@ -46,6 +49,7 @@ PLATFORMS
 DEPENDENCIES
   dotenv
   rake
+  tty-spinner
   twitter
 
 RUBY VERSION
