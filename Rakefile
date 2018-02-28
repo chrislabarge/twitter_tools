@@ -4,6 +4,7 @@ require 'tty-spinner'
 require_relative 'lib/twitter_wrapper'
 require 'rspec/core/rake_task'
 include TwitterWrapper
+
 # task default: %w[test]
 
 # task :test do
