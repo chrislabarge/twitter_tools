@@ -6,6 +6,10 @@ module TwitterWrapper
       @client = load_client
     end
 
+    def tweet(text)
+      @client.update(text)
+    end
+
     def process_tweets_containing(text, method = nil, limit = 80)
       @original_count = resource_count(method)
       terms = load_terms(text)
