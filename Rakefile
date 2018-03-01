@@ -3,13 +3,9 @@ require 'yaml'
 require 'tty-spinner'
 require_relative 'lib/twitter_wrapper'
 require 'rspec/core/rake_task'
+require 'securerandom'
 include TwitterWrapper
 
-# task default: %w[test]
-
-# task :test do
-#   ruby "test/unittest.rb"
-# end
 RSpec::Core::RakeTask.new do |task|
   task.rspec_opts = ["-c", "-f progress", "-r ./spec/spec_helper.rb"]
   task.pattern    = 'spec/**/*_spec.rb'
@@ -44,5 +40,9 @@ CONFIG_FILES.each do |f|
 
     client.process_tweets_containing(config['terms'], :favorite, limit)
     spinner.success
+  end
+
+  task :generate_token do
+    puts SecureRandom.urlsafe_base64(64)
   end
 end
