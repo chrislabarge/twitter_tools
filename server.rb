@@ -1,48 +1,47 @@
 require 'dotenv/load'
 require 'sinatra'
-require 'base64'
 require 'json'
 require_relative 'lib/twitter_wrapper'
 
 get '/' do
-  'something'
+  'Running'
 end
 
 post '/tweets/new' do
-  return unless (content = incoming_content(request))
-
   begin
-    # puts 'now hereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
-    wrapper = TwitterWrapper::Wrapper.new
-    response = wrapper.tweet(content)
+    content = receive_content(request)
+    body tweet(content)
     status 200
-    body response
-  rescue Exception => e
-    status 500
+  rescue StandardError => e
+    status tweet_error_status(content)
     body e.to_s + "\n"
   end
 end
 
-def incoming_content(request)
+def receive_content(request)
+  payload = receive_payload(request)
+  token = get_token(payload)
+
+  authenticate(token)
+  get_content(payload)
+end
+
+def receive_payload(request)
+  request_to_json(request)
+rescue StandardError => e
+  raise 'JSON format is invalid: ' + e.to_s
+end
+
+def request_to_json(request)
   request.body.rewind
 
   request_content = request.body.read
-  payload = JSON.parse request_content
-  token = get_token(payload)
 
-  return unless authenticate(token)
-
-  get_content(payload)
-  #I shouldnt be rescuing the exception, I should be rescuing the StandardError
-rescue Exception => e
-  status 400
-  body e.to_s + "\n"
-  nil
+  JSON.parse request_content
 end
 
 def get_content(hash)
   hash["content"] || raise('Provide "content" key with value to tweet')
-  sdfsdf
 end
 
 def get_token(hash)
@@ -50,9 +49,21 @@ def get_token(hash)
 end
 
 def authenticate(token)
-  return true if token == ENV['WEBHOOK_TOKEN']
+  return unless token != ENV['WEBHOOK_TOKEN']
 
   status 403
-  body "Invalid Credientials\n"
-  false
+  raise "Invalid Credientials\n"
+end
+
+def tweet(content)
+  wrapper = TwitterWrapper::Wrapper.new
+  wrapper.tweet(content)
+end
+
+def tweet_error_status(content)
+  if response.status == 200
+    content.nil? ? 400 : 500
+  else
+    response.status
+  end
 end
