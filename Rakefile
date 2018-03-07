@@ -42,6 +42,16 @@ CONFIG_FILES.each do |f|
     spinner.success
   end
 
+  task :retweet do
+    spinner.auto_spin
+
+    client = Wrapper.new
+
+    client.retweet(config['retweet_term'])
+
+    spinner.success
+  end
+
   task :generate_token do
     puts SecureRandom.urlsafe_base64(64)
   end

@@ -11,6 +11,20 @@ module TwitterWrapper
       log_successful(tweet)
     end
 
+    def retweet(term)
+      tweet = find_tweet_to_retweet(term)
+
+      @client.retweet(tweet)
+
+      successful_retweet(tweet)
+    end
+
+    def find_tweet_to_retweet(term)
+      tweets = @client.home_timeline
+      tweet = tweets.find { |tweet| contains_keyword?(tweet, term) }
+      tweet || raise(retweet_error(term))
+    end
+
     def process_tweets_containing(text, method = nil, limit = 80)
       @original_count = resource_count(method)
       terms = load_terms(text)
@@ -36,6 +50,10 @@ module TwitterWrapper
 
     def test
       @client
+    end
+
+    def contains_keyword?(tweet, term)
+      tweet.text.downcase.include?(term)
     end
 
     def gather_tweets_containing(content)
@@ -86,11 +104,21 @@ module TwitterWrapper
       msg
     end
 
+    def successful_retweet(tweet)
+      msg = "Succcessfully retweeted: #{tweet.id}"
+      puts msg
+      msg
+    end
+
     def successful_log_msgs(count, terms)
       {
         follow: "Started following #{count} new users who's recent tweets included one of the following search terms #{terms}",
         favorite: "Favorited #{count} new tweets that included one of the following terms #{terms}"
       }
+    end
+
+    def retweet_error(term)
+      "Unable to find any recent tweets containing term: #{term}"
     end
   end
 end
