@@ -7,7 +7,8 @@ module TwitterWrapper
     end
 
     def tweet(text)
-      @client.update(text)
+      tweet = @client.update(text)
+      log_successful(tweet)
     end
 
     def process_tweets_containing(text, method = nil, limit = 80)
@@ -77,6 +78,12 @@ module TwitterWrapper
       count = resource_count(method) - @original_count
       puts 'Success!!'
       puts successful_log_msgs(count, terms)[method]
+    end
+
+    def log_successful(resource)
+      msg = "Succcessfully created tweet: #{resource.id}"
+      puts msg
+      msg
     end
 
     def successful_log_msgs(count, terms)

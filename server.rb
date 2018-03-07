@@ -8,6 +8,10 @@ get '/' do
 end
 
 post '/tweets/new' do
+  create_tweet
+end
+
+def create_tweet
   begin
     content = receive_content(request)
     body tweet(content)
